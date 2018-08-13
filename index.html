@@ -1,0 +1,199 @@
+<html>
+	<head>
+
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.2/angular.min.js"></script>
+		<script src="wcapi.js"></script>
+		<?php
+		//require_once('dbcon.php');
+		?>
+	</head>
+	<body ng-app='starter.services' ng-controller='myCtrl'>
+		<pre id="result" class="prettyprint">Loading ...</pre>
+
+		<script>
+			var Woocommerce = null;
+			var app = angular.module('starter.services',[]);
+			app.service('WC', function(){
+			    return {
+			        WC: function(){
+			            var WoocommerceObj = new WoocommerceAPI({
+			                url: 'http://pc.hcilab.ml/metagig',
+			                consumerKey: 'ck_abd529a9cf00444fbd5ac760ec2a9232fc9fa6b6',
+			                consumerSecret: 'cs_5095dd4b02e68e821fc9a03b29e6fdd850fb4788',
+					        wpAPI: true,
+			  		        version: 'wc/v2'
+			            })
+			            return WoocommerceObj;
+			        }
+			}});
+			app.controller('myCtrl', function($scope, WC){
+			  Woocommerce = WC.WC();
+			  get_categories(data => {
+			  	console.log(data);
+			  });
+			  get_customers(data => {
+			  	console.log(data);
+			  });
+			  get_orders(data => {
+			  	console.log(data);
+			  });
+			  get_reports(data => {
+			  	console.log(data);
+			  });
+			  get_sales(data => {
+			  	console.log(data);
+			  });
+
+			  get_products(data => {
+			  	console.log(data);
+			  	document.getElementById('result').innerHTML = 'Loaded'
+			  	//JSON.stringify(data, null, 2);
+			  });
+
+			});
+
+			function get_categories(callback) {
+				Woocommerce.get('products/categories', function(err, data, res){
+					if(err)
+						console.log(err);
+					console.log('categories');			
+					//callback(JSON.parse(res));
+					var objeto = JSON.parse(res);
+					var i ;
+					var resultado = {};
+					for( i = 0; i< objeto.length; i++){
+						if (resultado[i] === undefined) {
+        					resultado[i] = {}
+        					resultado[i]['id'] = objeto[i]['id'];
+        					resultado[i]['name'] = objeto[i]['name'];
+        					resultado[i]['description'] = objeto[i]['description'];
+        					};
+					}
+					
+					callback(resultado);
+					
+				});
+			}
+
+			function get_products(callback) {
+				Woocommerce.get('products', function(err, data, res){
+				    if(err)
+						console.log(err);
+						console.log('products');
+						//callback(JSON.parse(res));
+						var objeto = JSON.parse(res);
+						var i;
+						var resultado={};
+						for( i = 0; i< objeto.length; i++){
+						if (resultado[i] === undefined) {
+        					resultado[i] = {}
+   						
+						resultado[i]['id']= objeto[i]['id'];
+						resultado[i]['name'] = objeto[i]['name'];
+						resultado[i]['name'] = objeto[i]['slug'];
+						resultado[i]['catalog_visible']=objeto[i]['catalog_visible'];
+						resultado[i]['description'] = objeto[i]['description'];
+						resultado[i]['short_description'] = objeto[i]['short_description'];
+						resultado[i]['regular_price'] = objeto[i]['regular_price'];
+						resultado[i]['sale_price'] = objeto[i]['sale_price'];
+						//resultado.categories = objeto[i]['categories'];
+						};
+					}
+						callback(resultado);
+						
+				    //callback(JSON.parse(res));
+				});
+			}
+
+			function get_orders(callback) {
+				Woocommerce.get('orders', function(err, data, res) {
+				    if(err)
+						console.log(err);
+						console.log('orders');
+						var objeto = JSON.parse(res);
+						var resultado = {};
+						var i;
+						for( i = 0; i< objeto.length; i++){
+							if (resultado[i] === undefined) {
+        					resultado[i] = {}
+							resultado[i]['orderID']= objeto[i]['id'];
+							resultado[i]['customer'] = objeto[i]['billing']['first_name'] + 
+							" " + objeto[i]['billing']['last_name'];
+							resultado[i]['status'] = objeto[i]['status'];
+							resultado[i]['status'] = objeto[i]['total'];
+							resultado[i]['order_date'] = objeto[i]['date_created'];
+							};
+							
+						}
+						callback(resultado);
+				    //callback(JSON.parse(res));
+				});
+			}
+
+		function get_customers(callback) {
+			Woocommerce.get('customers', function(err, data, res) {
+			    if(err)
+					console.log(err);
+					
+					var objeto = JSON.parse(res);
+					var resultado = {};
+					console.log('customers');
+					var i;
+					for( i = 0; i< objeto.length; i++){
+						if (resultado[i] === undefined) {
+        					resultado[i] = {}
+						resultado[i]['name']= objeto[i]['first_name'] + " " + 
+						objeto[i]['last_name'];
+						resultado[i]['profilePic'] = objeto[i]['avatar_url'];
+						resultado[i]['about'] = "rating";
+						resultado[i]['description'] = "Description";
+						};
+					}						
+						/*
+						resultado.city = objeto[1]['billing']['city'];
+						resultado.state = objeto[1]['billing']['state'];
+						resultado.postcode = objeto[1]['billing']['postcode'];
+						resultado.country = objeto[1]['billing']['country'];
+						resultado.phone = objeto[1]['billing']['phone'];
+						resultado.profilePic = objeto[1]['avatar_url'];
+						*/
+						/*
+						resultado.first_name = objeto.billing.first_name;
+						resultado.last_name = objeto.last_name;
+						resultado.username = objeto.username;
+						resultado.email = objeto.email;
+						resultado.address_1 = objeto.address_1;
+						resultado.city = objeto.city;
+						resultado.state = objeto.state;
+						resultado.postcode = objeto.postcode;
+						resultado.country = objeto.country;
+						
+				    console.log('customers');
+				    callback(resultado);
+				    */
+				    callback(resultado);
+				    //callback(JSON.parse(res));
+				    
+				});
+			}
+
+			function get_reports(callback) {
+				Woocommerce.get('reports', function(err, data, res) {
+				    if(err)
+						console.log(err);
+					console.log('reports');
+				    callback(JSON.parse(res));
+				});
+			}
+			function get_sales(callback) {
+				Woocommerce.get('reports/sales', function(err, data, res) {
+				    if(err)
+						console.log(err);
+					console.log('sales');
+				    callback(JSON.parse(res));
+				});
+			}	
+		</script>
+	</body>
+</html>
